@@ -62,14 +62,36 @@
 - **Kiểm chứng tài liệu:** kiểm tra UTF-8, liên kết nội bộ, số cột bảng và parse cú pháp các khối PowerShell, không thực thi lệnh trong khối. Không coi kiểm tra Markdown là pass ứng dụng. Sinh viên cần tự đọc, hiểu và cập nhật theo code thực tế.
 - **Kiểm chứng ứng dụng/API trong lượt này:** không chạy setup/tests/demo/eval/live; không đọc .env hoặc API key. Chưa có số liệu LLM/embedding/judge thật của repo này để điền.
 
+### Phase 2: Dữ liệu, Dataclass và Validation
+
+- **Công cụ:** Antigravity (Gemini).
+- **Phạm vi hỗ trợ:**
+  - Giải thích yêu cầu kỹ thuật: typing với `dataclass`/`TypedDict` (W1), cơ chế single source of truth của `Corpus` cho RAG và tính toán số học, cơ chế phả hệ tài liệu `supersedes` xử lý phiên bản thay thế.
+  - Cung cấp mã nguồn tham khảo cho `src/models.py` và `src/data.py` dựa trên nguyên mẫu kỹ thuật.
+  - Review mã nguồn do sinh viên tự tay gõ, chỉ ra chính xác các lỗi cú pháp và lỗi gõ phím (lỗi `type[origin]` thay vì `types[origin]` ở dòng 73 của `src/models.py` dẫn đến `AssertionError`, định dạng ngày thiếu số 0, lỗi typo ở `completion_tokens` và `Answer`) mà không can thiệp sửa trực tiếp vào file của sinh viên để sinh viên tự sửa.
+- **Các prompt thực tế sinh viên đã gửi:**
+  1. *"từ các file cấu hình trong project, bạn hãy đọc và giúp tôi gợi ý code phần phase 2, có thể giải thích kỹ càng."*
+  2. *"tôi viết xong rồi nhờ bạn check lại, có gì sai sót thì chỉ ra để tôi sửa hoặc tối ưu nó"*
+- **Mã nguồn hoặc tài liệu có AI hỗ trợ:**
+  - `src/models.py`: AI gợi ý định nghĩa dataclass (`Metadata`, `Document`, `Chunk`, `SearchArgs`, `AnalysisArgs`, `ToolSpec`, `tool_schema`, `Source`, `Usage`, `Action`, `Answer`).
+  - `src/data.py`: AI gợi ý cấu trúc class `Corpus` (các hàm `__init__`, `eligible`, `get`, `source`, `analyze`).
+  - `data/corpus.jsonl` và `data/provenance.md`: Tái sử dụng tập 13 tài liệu tổng hợp và tài liệu nguồn gốc từ nguyên mẫu kỹ thuật.
+- **Kiểm chứng thực tế của sinh viên:**
+  - Sinh viên tự tay gõ mã nguồn vào 2 file `src/models.py` và `src/data.py`.
+  - Nhận diện và tự chỉnh sửa các lỗi typo theo giải thích của AI (sửa `types[origin]`, ngày chuẩn `2026-10-08`, sửa tên biến).
+  - Chạy smoke test kiểm tra nạp dữ liệu, lọc phiên bản và schema tại terminal:
+    Lệnh: nạp Corpus, kiểm tra đủ 13 docs, eligible P001 tại 2026-10-08 chọn đúng P001-PLAN, P001-W2-V2, POLICY-V2; loại trừ V1 và P002; get P001-W2-V1 trả đúng 50; tool_schema sinh đúng type 'string'.
+    Kết quả thực tế trên máy sinh viên: `Phase 2: PASS`.
+- **Trạng thái Phase 2:** **ĐÃ HOÀN THÀNH (PASSED)**.
+
 ---
 
-### Phase 2–10: Kế hoạch cập nhật tiếp theo
+### Phase 3–10: Kế hoạch cập nhật tiếp theo
 
 | Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
 |---|---|---|---|---|---|
-| **Phase 2** | models.py, data.py | Giải thích schema/nạp corpus | Giải thích và review theo yêu cầu, chưa ghi là đã làm | Tự viết và kiểm tra metadata/version | Đang bắt đầu |
-| **Phase 3** | store.py, analyze | Giải thích phép tính/SQLite | Review công thức và lỗi, khi được yêu cầu | Tự viết/test trọng số và insufficient_data | Chưa thực hiện |
+| **Phase 2** | models.py, data.py | Gợi ý schema/review code tay | Hướng dẫn cấu trúc & chỉ lỗi typo | Tự tay gõ, sửa lỗi và pass smoke test | ĐÃ HOÀN THÀNH (PASSED) |
+| **Phase 3** | store.py, analyze | Giải thích phép tính/SQLite | Review công thức và lỗi, khi được yêu cầu | Tự viết/test trọng số và insufficient_data | Đang bắt đầu |
 | **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu thuật toán tuần 4 | Giải thích tái dùng/provenance và adapter offline | Hiểu dense/BM25, ghi nguồn mã lớp | Chưa thực hiện |
 | **Phase 5** | MCP server/client | Giải thích stdio/discovery | Review schema/tool contract | Tự kiểm tra discovery, write → read | Chưa thực hiện |
 | **Phase 6** | agent/runtime/CLI | Giải thích loop và recovery | Review parser/permission/MAX_STEPS | Tự viết, giải thích, chạy offline | Chưa thực hiện |
