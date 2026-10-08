@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env*
+!.env.example
+state/
+cache/
+tmp/
+credentials*.json
+secrets*.json
+*.pem
+*.key

@@ -1,0 +1,89 @@
+# Khai báo sử dụng AI trong đồ án
+
+**Đề tài:** Trợ lý AI hỗ trợ quản lý và phân tích tiến độ dự án bằng RAG, Agent và MCP.
+
+**Hình thức thực hiện:** Cá nhân (1 sinh viên).
+
+**Trạng thái:** Đang thực hiện – cập nhật theo từng phase.
+
+**Quy tắc ghi nhận:** chỉ ghi hỗ trợ đã diễn ra; mục tương lai là kế hoạch, không phải việc đã làm. Tóm tắt prompt không được coi là bản chép nguyên văn. Code gõ lại từ bản AI tạo vẫn cần khai báo nguồn AI; kết quả mock không phải thực nghiệm của repo này.
+
+---
+
+## 1. Công cụ và mục đích sử dụng AI
+
+- **Công cụ đã khai báo trong nhật ký sinh viên:** ChatGPT, OpenAI Codex, Antigravity (Gemini). Lượt cập nhật tài liệu 08/10/2026 này do Codex hỗ trợ; không mặc định mọi công cụ tham gia mọi phase.
+- **Mục đích:**
+  - Hỗ trợ phân tích yêu cầu từ tài liệu môn học, lên kế hoạch triển khai và checklist từng bước.
+  - Hỗ trợ giải thích kiến trúc hệ thống (RAG 2 chế độ, giao thức MCP stdio, vòng lặp Agent loop tự viết).
+  - Hỗ trợ bản mẫu kỹ thuật, mã khung và cấu hình Windows; sinh viên dùng bản mẫu làm nguồn để tự học/gõ lại, cần giải thích và sửa được code.
+  - Hỗ trợ rà soát cú pháp, type hints và gợi ý kịch bản kiểm thử (test fixtures).
+  - Mô phỏng, phân tích kỹ tên đề tài và kết luận có thể triển khai không, có thể hoàn thành như mục đích cuối cùng không và có chuẩn theo yêu cầu không.
+- **Nguyên mẫu kỹ thuật tham khảo:** Trước khi triển khai đồ án chính thức, sinh viên sử dụng ChatGPT và Codex để hỗ trợ xây dựng một nguyên mẫu kỹ thuật nhằm nghiên cứu kiến trúc RAG – Agent – MCP, tham khảo cách tổ chức mã nguồn, kiểm thử và xử lý lỗi. Nguyên mẫu được sử dụng làm tài liệu tham khảo; các kết quả thực nghiệm của đồ án chính thức được kiểm chứng riêng trên repository nộp.
+
+---
+
+## 2. Nhật ký sử dụng AI chi tiết theo từng Phase
+
+### Phase 1: Khởi tạo Repo, Môi trường & Khung dự án
+
+- **Công cụ:** ChatGPT, Codex, Antigravity.
+- **Phạm vi hỗ trợ:**
+  - Phân tích yêu cầu từ 2 tài liệu môn học (`01-De-tai-upload-for-student.pdf` và `02-Yeu-cau-Thuc-hien.pdf`) để xác định phạm vi 3 tầng bắt buộc (Tra cứu – Biến đổi – Hành động).
+  - Hỗ trợ xây dựng cấu trúc thư mục dự án, kịch bản khởi tạo môi trường Python 3.11 và tài liệu ban đầu.
+
+- **Tóm tắt các yêu cầu chính đã sử dụng (không phải transcript nguyên văn):**
+  1. *"Đọc các tài liệu yêu cầu đồ án môn học AIPR (01-De-tai-upload-for-student.pdf và 02-Yeu-cau-Thuc-hien.pdf), phân tích các tiêu chí bắt buộc (3 tầng tra cứu - biến đổi - hành động, RAG dense/hybrid, MCP stdio, Agent loop tự viết, SQLite verify) và hướng dẫn triển khai từng bước ngắn gọn cho tôi."*
+  2. *"Hỗ trợ thiết kế cấu trúc dự án và tạo kịch bản run.py cho môi trường Windows để quản lý venv Python 3.11, cài đặt phụ thuộc từ requirements.lock.txt, điều phối các lệnh demo/eval/test mà không đọc hoặc làm lộ file .env."*
+  3. *"Tạo launcher Makefile và make.cmd tương thích trên Windows CMD và PowerShell để hỗ trợ chạy đồ án bằng lệnh chuẩn (make setup, make demo, make eval)."*
+
+- **Mã nguồn hoặc tài liệu có AI hỗ trợ:**
+  - File `run.py`, `Makefile`, `make.cmd`, `config.json`: Tái sử dụng và điều chỉnh từ nguyên mẫu kỹ thuật sau khi đối chiếu yêu cầu không để lộ `.env` và tương thích tốt trên môi trường Windows.
+  - File `.gitignore`: AI đề xuất danh sách loại trừ nhạy cảm (`.venv/`, `.env*`, `credentials*`, `state/`, `cache/`, `tmp/`).
+  - File `README.md`, `ai-usage.md`: AI hỗ trợ soạn thảo khung tài liệu ban đầu; sinh viên trực tiếp rà soát và hiệu chỉnh.
+
+- **Kiểm chứng được sinh viên ghi trong nhật ký trước lượt bổ sung tài liệu này:** các thông tin dưới đây được giữ lại theo ghi nhận của sinh viên, Codex không chạy lại hoặc xác minh Git history trong lượt này. Khi nộp, bổ sung lệnh/output hoặc commit hash thật để đối chiếu.
+  - Khởi tạo Git repo cục bộ trên nhánh `main` (`git init -b main`).
+  - Chạy lệnh `py -3.11 run.py setup` tạo thành công `.venv` và cài 45 packages theo `requirements.lock.txt`.
+  - Xác nhận phiên bản: `.\.venv\Scripts\python.exe --version` trả về `Python 3.11.0`.
+  - Xác nhận tính toàn vẹn: `.\.venv\Scripts\python.exe -m pip check` trả về `No broken requirements found`.
+  - Xác nhận ignore: `git check-ignore` xác nhận các path mẫu `.env`, `.venv`, `cache`, `state`, `tmp` khớp quy tắc ignore. Điều này không tự chứng minh chưa từng track hoặc đưa bí mật vào history; cần kiểm tra tên tracked/history trước commit/đóng gói.
+  - Thực hiện commit Git đầu tiên thành công: `chore: initialize personal AIPR project and Python 3.11 environment`.
+
+- **Trạng thái Phase 1:** Sinh viên đã ghi hoàn thành setup/commit; lượt cập nhật tài liệu này không chạy lại. Source nghiệp vụ và kiểm chứng các phase tiếp theo vẫn chưa hoàn tất.
+
+### Bổ sung tài liệu local ngày 08/10/2026
+
+- **Công cụ:** OpenAI Codex.
+- **Yêu cầu thực tế:** thêm bộ tài liệu tối thiểu cho AI tiếp tục đúng thiết kế trên máy khác; cập nhật README và ai-usage. Chỉ local, không copy PDF/sổ tay, không commit/push và không API live.
+- **File có AI soạn/chỉnh:** AGENTS.md, docs/ARCHITECTURE.md, docs/SETUP.md, README.md và mục nhật ký này. Sổ tay bên ngoài repo được cập nhật để nhận diện bộ tài liệu mới và đóng gói AGENTS.md khi sinh viên thực hiện về sau.
+- **Nguồn đối chiếu:** file công khai của repo thật, code/tài liệu kiến trúc trong mock và sổ tay đã chốt. Không thay đổi source nghiệp vụ, config/lock, mock, Git history hoặc số liệu.
+- **Nội dung:** quyền API đang khóa; ranh giới module/tool; setup Windows 3.11; trạng thái hiện có khác thiết kế đích; điều kiện offline/live và bằng chứng nộp.
+- **Kiểm chứng tài liệu:** kiểm tra UTF-8, liên kết nội bộ, số cột bảng và parse cú pháp các khối PowerShell, không thực thi lệnh trong khối. Không coi kiểm tra Markdown là pass ứng dụng. Sinh viên cần tự đọc, hiểu và cập nhật theo code thực tế.
+- **Kiểm chứng ứng dụng/API trong lượt này:** không chạy setup/tests/demo/eval/live; không đọc .env hoặc API key. Chưa có số liệu LLM/embedding/judge thật của repo này để điền.
+
+---
+
+### Phase 2–10: Kế hoạch cập nhật tiếp theo
+
+| Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
+|---|---|---|---|---|---|
+| **Phase 2** | models.py, data.py | Giải thích schema/nạp corpus | Giải thích và review theo yêu cầu, chưa ghi là đã làm | Tự viết và kiểm tra metadata/version | Đang bắt đầu |
+| **Phase 3** | store.py, analyze | Giải thích phép tính/SQLite | Review công thức và lỗi, khi được yêu cầu | Tự viết/test trọng số và insufficient_data | Chưa thực hiện |
+| **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu thuật toán tuần 4 | Giải thích tái dùng/provenance và adapter offline | Hiểu dense/BM25, ghi nguồn mã lớp | Chưa thực hiện |
+| **Phase 5** | MCP server/client | Giải thích stdio/discovery | Review schema/tool contract | Tự kiểm tra discovery, write → read | Chưa thực hiện |
+| **Phase 6** | agent/runtime/CLI | Giải thích loop và recovery | Review parser/permission/MAX_STEPS | Tự viết, giải thích, chạy offline | Chưa thực hiện |
+| **Phase 7** | Tests/evaluator | Review refusal/citation/metrics | Đề xuất ca lỗi và kiểm tra evaluator | Tự chạy, ghi số ca/kết quả thực | Chưa thực hiện |
+| **Phase 8** | Live eval/logs | Lập ngân sách live | Chỉ hỗ trợ live sau cho phép rõ ràng | Tự cấp key, kiểm chứng và phân tích log | Chưa thực hiện; API khóa |
+| **Phase 9** | Report/README | Review Word 8–9 trang | Kiểm tra nội dung theo số liệu đã có | Viết failure/hạn chế/đóng góp thật | Chưa thực hiện |
+| **Phase 10** | Cold start/đóng gói/bảo vệ | Luyện vấn đáp/sửa code | Đặt câu hỏi và kiểm tra hồ sơ theo quyền | Tự giải thích, sửa code, commit và nộp | Chưa thực hiện |
+
+---
+
+## 3. Trách nhiệm & Cam kết liêm chính học thuật
+
+- **Trách nhiệm mã nguồn:** Sinh viên chịu trách nhiệm 100% về mọi dòng code trong sản phẩm nộp, hiểu rõ từng module và sẵn sàng trả lời vấn đáp kỹ thuật cũng như sửa code trực tiếp tại chỗ theo yêu cầu của Giảng viên.
+- **Tính trung thực dữ liệu:** Toàn bộ kết quả thực nghiệm, file trace JSONL và bảng đo `USAGE` trong báo cáo sẽ được sinh ra từ các lần chạy thật trên repo cá nhân, không lấy số đo giả lập hay tự tạo số liệu khống.
+- **Bảo mật thông tin:** Tuyệt đối không lưu trữ API key trên Git hay tài liệu nộp.
+
+- **Cách cập nhật nhật ký:** với mỗi mốc thật, ghi ngày, công cụ, yêu cầu tóm tắt, file/dòng hoặc commit liên quan, phần AI hỗ trợ, phần sinh viên tự sửa, lệnh kiểm chứng và giới hạn. Không điền trước pass/commit hash/số liệu API; không gửi key hoặc diff chứa bí mật vào chat.

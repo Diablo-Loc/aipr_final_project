@@ -1,0 +1,10 @@
+{
+  "max_steps": 8,
+  "top_k": 4,
+  "chunk_chars": 1000,
+  "llm_model": "qwen/qwen3.8-27b",
+  "judge_model": "openai/gpt-oss-20b",
+  "embedding_model": "jina-embeddings-v3",
+  "timeout_seconds": 30,
+  "max_attempts": 3
+}
