@@ -104,16 +104,40 @@
     Kết quả thực tế trên máy sinh viên: `Phase 3: PASS`.
 - **Trạng thái Phase 3:** **ĐÃ HOÀN THÀNH (PASSED)**.
 
+### Phase 4: Dense và Hybrid RAG
+
+- **Công cụ:** Antigravity (Gemini).
+- **Phạm vi hỗ trợ:**
+  - Hướng dẫn cấu trúc tái sử dụng thuật toán tuần 4 (`week4/ex2_1_hybrid_search.py`) cho `src/hybrid.py`: chuẩn hóa Min-Max (`normalise_scores`), lập chỉ mục `BM25Okapi` (`build_bm25_index`) và hợp nhất điểm số weighted fusion (`hybrid_search` theo tỷ lệ 0.5 BM25 + 0.5 Cosine).
+  - Hướng dẫn thiết kế `src/api.py`: cơ chế `Trace` ghi log JSONL và tự động che giấu bí mật (redact API keys), wrapper HTTP `post_json` với retry 3 lần / timeout 30s / xử lý HTTP 429 rate limit, class `Embedder` có cache file JSON và chế độ offline deterministic hash, class `LiveModel` gọi Groq Chat Completion và log USAGE.
+  - Hướng dẫn thiết kế `src/rag.py`: hàm tính độ tương đồng `cosine`, chiến lược chunking theo dòng (line-based) không cắt ngang row task và kế thừa metadata gốc, class `Retriever` hỗ trợ linh hoạt cả 2 chế độ `dense` và `hybrid`.
+  - Hỗ trợ review toàn bộ mã nguồn do sinh viên tự tay gõ trong 3 file
+- **Các prompt thực tế sinh viên đã gửi:**
+  1. *"tiếp tục nào"* (bắt đầu Phase 4).
+  2. *"code xong hết rồi, giờ bạn giúp check toàn bộ code vừa thêm, xem lỗi ở đâu không"*
+  3. *"Phase 4: PASS giúp tôi update luôn ai-usage.md"*
+- **Mã nguồn hoặc tài liệu có AI hỗ trợ:**
+  - `src/hybrid.py`: AI gợi ý cấu trúc tái sử dụng từ bài tuần 4 (`vendor/week4/ex2_1_hybrid_search.original.py`).
+  - `src/api.py`: AI gợi ý mã nguồn tham khảo từ nguyên mẫu kỹ thuật cho các class `Trace`, `Embedder`, `LiveModel` và hàm `post_json`.
+  - `src/rag.py`: AI gợi ý mã nguồn tham khảo cho hàm `chunk_document` và class `Retriever`.
+- **Kiểm chứng thực tế của sinh viên:**
+  - Sinh viên tự tay gõ mã nguồn vào 3 file `src/hybrid.py`, `src/api.py`, `src/rag.py`.
+  - Tự nhận diện và sửa các lỗi thụt lề, lỗi gõ phím theo giải thích của AI.
+  - Chạy smoke test Phase 4 tại terminal:
+    Lệnh: khởi tạo `Retriever(corpus, 'offline')`, thực hiện tra cứu 'tiến độ P001' với cả 2 chế độ `dense` và `hybrid` với `top_k=2`, kiểm tra trả về đúng 2 chunks, đúng mode và đầy đủ metadata `doc_id`.
+    Kết quả thực tế trên máy sinh viên: `Phase 4: PASS`.
+- **Trạng thái Phase 4:** **ĐÃ HOÀN THÀNH (PASSED)**.
+
 ---
 
-### Phase 4–10: Kế hoạch cập nhật tiếp theo
+### Phase 5–10: Kế hoạch cập nhật tiếp theo
 
 | Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
 |---|---|---|---|---|---|
 | **Phase 2** | models.py, data.py | Gợi ý schema/review code tay | Hướng dẫn cấu trúc & chỉ lỗi typo | Tự tay gõ, sửa lỗi và pass smoke test | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 3** | store.py, analyze | Giải thích phép tính/SQLite | Hướng dẫn RequestStore, công thức & SQLite | Tự gõ code, kiểm tra tính toán và lưu SQLite | ĐÃ HOÀN THÀNH (PASSED) |
-| **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu thuật toán tuần 4 | Giải thích tái dùng/provenance và adapter offline | Hiểu dense/BM25, ghi nguồn mã lớp | Đang bắt đầu |
-| **Phase 5** | MCP server/client | Giải thích stdio/discovery | Review schema/tool contract | Tự kiểm tra discovery, write → read | Chưa thực hiện |
+| **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu tuần 4 / review code tay | Hướng dẫn RAG, BM25, API & review lỗi | Tự tay gõ 3 file, sửa lỗi và pass smoke test | ĐÃ HOÀN THÀNH (PASSED) |
+| **Phase 5** | MCP server/client | Giải thích stdio/discovery | Review schema/tool contract | Tự kiểm tra discovery, write → read | Đang bắt đầu |
 | **Phase 6** | agent/runtime/CLI | Giải thích loop và recovery | Review parser/permission/MAX_STEPS | Tự viết, giải thích, chạy offline | Chưa thực hiện |
 | **Phase 7** | Tests/evaluator | Review refusal/citation/metrics | Đề xuất ca lỗi và kiểm tra evaluator | Tự chạy, ghi số ca/kết quả thực | Chưa thực hiện |
 | **Phase 8** | Live eval/logs | Lập ngân sách live | Chỉ hỗ trợ live sau cho phép rõ ràng | Tự cấp key, kiểm chứng và phân tích log | Chưa thực hiện; API khóa |
