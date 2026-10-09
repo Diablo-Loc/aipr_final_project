@@ -84,15 +84,35 @@
     Kết quả thực tế trên máy sinh viên: `Phase 2: PASS`.
 - **Trạng thái Phase 2:** **ĐÃ HOÀN THÀNH (PASSED)**.
 
+### Phase 3: Phân tích tiến độ và SQLite
+
+- **Công cụ:** Antigravity (Gemini).
+- **Phạm vi hỗ trợ:**
+  - Giải thích yêu cầu Tầng 2 (Biến đổi): công thức tính tiến độ có trọng số giờ công ước tính ban đầu (`estimated_effort_hours`), độ chậm theo điểm phần trăm (`behind_pp`), phát hiện task quá hạn (`overdue`), và cơ chế từ chối khi thiếu dữ liệu (`insufficient_data`).
+  - Giải thích chi tiết sự thay đổi chính sách cảnh báo ngày 04/10 (`POLICY-V1` 20 pp thay bằng `POLICY-V2` 15 pp) để chứng minh khả năng chọn đúng phiên bản chính sách có hiệu lực tại ngày được hỏi (temporal validity).
+  - Hướng dẫn thiết kế class `RequestStore` trong `src/store.py` để lưu trữ trạng thái vào SQLite: cơ chế Transaction/commit tự động qua context manager, parameterized query `?` chống SQL Injection, và cơ chế Idempotency qua `operation_key` chống tạo trùng lặp ticket.
+- **Các prompt thực tế sinh viên đã gửi:**
+  1. *"bắt đầu phase 3 nào"*
+  2. *"Phase 3: PASS ok rooif. Nói được công thức và tại sao 04/10 policy đổi quyết định. Hiểu no_answer khác insufficient_data; không ghi khi dữ liệu thiếu ở tầng nghiệp vụ. Nói được transaction/commit, SQL parameters và operation_key. giải thích kỹ này chưa."*
+- **Mã nguồn hoặc tài liệu có AI hỗ trợ:**
+  - `src/store.py`: AI cung cấp mã nguồn tham khảo cho class `RequestStore` (các hàm `__init__`, `create`, `get`).
+  - Kịch bản smoke test Phase 3 kiểm tra liên hoàn phép tính `Corpus.analyze` và cơ chế ghi/đọc của `RequestStore`.
+- **Kiểm chứng thực tế của sinh viên:**
+  - Sinh viên tự tay gõ mã nguồn vào file `src/store.py`.
+  - Chạy smoke test Phase 3 tại terminal:
+    Lệnh: chạy tính toán P001 ngày 08/10 xác nhận planned 70.0%, actual 48.0%, behind 22.0 pp; T02 quá hạn 1 ngày; P003 trả về insufficient_data; ghi request vào SQLite `tmp/test_phase3.db` và đọc lại xác minh khớp `request_id`.
+    Kết quả thực tế trên máy sinh viên: `Phase 3: PASS`.
+- **Trạng thái Phase 3:** **ĐÃ HOÀN THÀNH (PASSED)**.
+
 ---
 
-### Phase 3–10: Kế hoạch cập nhật tiếp theo
+### Phase 4–10: Kế hoạch cập nhật tiếp theo
 
 | Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
 |---|---|---|---|---|---|
 | **Phase 2** | models.py, data.py | Gợi ý schema/review code tay | Hướng dẫn cấu trúc & chỉ lỗi typo | Tự tay gõ, sửa lỗi và pass smoke test | ĐÃ HOÀN THÀNH (PASSED) |
-| **Phase 3** | store.py, analyze | Giải thích phép tính/SQLite | Review công thức và lỗi, khi được yêu cầu | Tự viết/test trọng số và insufficient_data | Đang bắt đầu |
-| **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu thuật toán tuần 4 | Giải thích tái dùng/provenance và adapter offline | Hiểu dense/BM25, ghi nguồn mã lớp | Chưa thực hiện |
+| **Phase 3** | store.py, analyze | Giải thích phép tính/SQLite | Hướng dẫn RequestStore, công thức & SQLite | Tự gõ code, kiểm tra tính toán và lưu SQLite | ĐÃ HOÀN THÀNH (PASSED) |
+| **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu thuật toán tuần 4 | Giải thích tái dùng/provenance và adapter offline | Hiểu dense/BM25, ghi nguồn mã lớp | Đang bắt đầu |
 | **Phase 5** | MCP server/client | Giải thích stdio/discovery | Review schema/tool contract | Tự kiểm tra discovery, write → read | Chưa thực hiện |
 | **Phase 6** | agent/runtime/CLI | Giải thích loop và recovery | Review parser/permission/MAX_STEPS | Tự viết, giải thích, chạy offline | Chưa thực hiện |
 | **Phase 7** | Tests/evaluator | Review refusal/citation/metrics | Đề xuất ca lỗi và kiểm tra evaluator | Tự chạy, ghi số ca/kết quả thực | Chưa thực hiện |
