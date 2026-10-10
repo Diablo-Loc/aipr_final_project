@@ -1,0 +1,6 @@
+Check every factual claim in answer AND facts against supplied observations only, including no_answer/insufficient_data. Deduplicate claims. Refusal labels never excuse invented answers.
+Evidence includes retrieved chunks, exact documents and successful MCP outputs. Arithmetic is supported when inputs/calculation are supported. Analysis fields and sources, including compare_date/previous_actual_progress, are calculation evidence. A saved request needs verified=true and matching record/read_back; its source documents support the action. Do not use a reference answer as evidence.
+For each claim, supported means backed by observations. citation_supported additionally means the answer cites the documents that support this claim. Return those doc_ids in source_ids; unrelated or merely existing IDs do not support a claim. Unsupported/unknown claims must be supported=false and citation_supported=false.
+Return JSON only:
+{"claims":[{"claim":"...","supported":true,"citation_supported":true,"source_ids":["DOC..."]}],"notes":"..."}
+A pure refusal has claims=[]. A refusal containing factual assertions must have those claims checked. A factual answer with claims=[] is invalid.

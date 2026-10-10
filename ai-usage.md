@@ -153,9 +153,32 @@
     - Lệnh 2 (`.\.venv\Scripts\python.exe run.py interop`): host thứ hai discover 5 tools và xác nhận `Interop write/read verification: PASS`.
 - **Trạng thái Phase 5:** **ĐÃ HOÀN THÀNH (PASSED)**.
 
+### Phase 6: Vòng lặp Agent tự viết, Runtime, Offline Model & CLI
+
+- **Công cụ:** Antigravity (Gemini).
+- **Phạm vi hỗ trợ:**
+  - Giải thích cơ chế vòng lặp Agent tự viết hoàn toàn bằng Python (`src/agent.py`) không dùng LangChain hay AgentExecutor ẩn: khởi tạo ngữ cảnh `RAG_CONTEXT` ban đầu (`retrieval_bootstrap`), vòng lặp `for turn in range(max_steps)` với `MAX_STEPS = 8`, phân biệt lỗi JSON/schema thông thường với `EvidenceError` (bắt buộc gọi thêm tool thật khi thiếu bằng chứng số liệu hoặc trích dẫn ngoài tập tài liệu đã quan sát), kiểm tra ngân sách bước trước khi ghi (`tool_steps + 2 <= max_steps`) để luôn dành chỗ cho bước đọc lại xác minh (`verify`).
+  - Giải thích cơ chế `src/runtime.py` nạp biến môi trường `.env` an toàn cho tiến trình cha khi chạy live mà không in giá trị khóa ra màn hình, và `src/cli.py` điều phối 4 kịch bản demo kèm ghi vết `Trace` JSONL.
+  - Hỗ trợ review mã nguồn do sinh viên tự tay gõ trong `src/runtime.py`, `src/agent.py`, `src/cli.py` và chỉ ra các lỗi gõ phím (`removeperfix` -> `removeprefix`, `request-id` -> `request_id`, `"Error "` -> `"Error:"`, `action.aguments` -> `action.arguments`, `startwith` -> `startswith`, thiếu biến `args.query` trong `cli.py`) để sinh viên tự sửa trực tiếp.
+- **Các prompt thực tế sinh viên đã gửi:**
+  1. *"ok tiếp tục phase 6"*
+  2. *"bạn check code toàn bộ tôi vừa thêm đi"*
+  3. *"ok chưa, file src/offline_model.py copy nên có gì note lại."*
+- **Mã nguồn hoặc tài liệu có AI hỗ trợ (phân biệt rõ phần tự gõ và phần tái sử dụng):**
+  - `src/runtime.py`, `src/agent.py`, `src/cli.py`: AI cung cấp mã tham khảo từ nguyên mẫu kỹ thuật; **sinh viên tự tay gõ toàn bộ mã nguồn** và tự sửa các lỗi cú pháp/typo sau khi AI review.
+  - `src/offline_model.py` và `templates/agent.txt`, `templates/judge.txt`: **Sao chép (tái sử dụng nguyên bản) từ nguyên mẫu kỹ thuật**. Trong đó `src/offline_model.py` đóng vai trò bộ điều khiển giả lập tất định (deterministic offline test driver) để kiểm thử luồng Agent – MCP – SQLite khi không gọi API thật, còn `templates/*.txt` là mẫu system prompt cho Agent và Judge.
+- **Kiểm chứng thực tế của sinh viên:**
+  - Chạy kiểm thử HTTP 401 stub bằng `unittest.mock.patch('httpx.Client.post')`: xác nhận mã lỗi 401 dừng ngay lập tức không retry (`send.call_count == 1`), kết quả: `HTTP stub: PASS`.
+  - Chạy lệnh `.\.venv\Scripts\python.exe run.py demo --backend offline`:
+    - Kịch bản D1 (*"Ai phụ trách T02 của P001?"*): trả về `[offline / ok]` với `{'owner': 'Minh'}`, nguồn `P001-PLAN`.
+    - Kịch bản D2 (*"P001 ngày 08/10/2026 chậm bao nhiêu so với kế hoạch?"*): trả về `[offline / ok]` với `planned_progress: 70.0`, `actual_progress: 48.0`, `behind_pp: 22.0`, `risk: True`, nguồn `P001-PLAN, P001-W2-V2, POLICY-V2`.
+    - Kịch bản D3 (*"Ngân sách đã chi của P001 là bao nhiêu?"*): trả về `[offline / no_answer]` với `{}`.
+    - Kịch bản D4 (*"Nếu P001 vượt ngưỡng ngày 08/10/2026, hãy tạo yêu cầu xử lý và xác nhận đã lưu."*): trả về `[offline / action_verified]` kèm `request_id` đã đối chiếu khớp trong SQLite và xuất file trace `logs/demo_offline_20261010T165849710869.jsonl`.
+- **Trạng thái Phase 6:** **ĐÃ HOÀN THÀNH (PASSED)**.
+
 ---
 
-### Phase 6–10: Kế hoạch cập nhật tiếp theo
+### Phase 7–10: Kế hoạch cập nhật tiếp theo
 
 | Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
 |---|---|---|---|---|---|
@@ -163,8 +186,8 @@
 | **Phase 3** | store.py, analyze | Giải thích phép tính/SQLite | Hướng dẫn RequestStore, công thức & SQLite | Tự gõ code, kiểm tra tính toán và lưu SQLite | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu tuần 4 / review code tay | Hướng dẫn RAG, BM25, API & review lỗi | Tự tay gõ 3 file, sửa lỗi và pass smoke test | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 5** | MCP server/client, interop | Hướng dẫn stdio/discovery/review | Hướng dẫn 5 tools, client động, host thứ 2 & review | Tự tay gõ 3 file, sửa typo và pass cả 2 lệnh | ĐÃ HOÀN THÀNH (PASSED) |
-| **Phase 6** | agent/runtime/CLI | Giải thích loop và recovery | Review parser/permission/MAX_STEPS | Tự viết, giải thích, chạy offline | Đang bắt đầu |
-| **Phase 7** | Tests/evaluator | Review refusal/citation/metrics | Đề xuất ca lỗi và kiểm tra evaluator | Tự chạy, ghi số ca/kết quả thực | Chưa thực hiện |
+| **Phase 6** | agent/runtime/CLI, offline_model | Giải thích loop/recovery & review code | Review code tay 3 file; ghi nhận copy offline_model & templates | Tự gõ runtime/agent/cli, sửa lỗi và pass demo offline | ĐÃ HOÀN THÀNH (PASSED) |
+| **Phase 7** | Tests/evaluator | Review refusal/citation/metrics | Đề xuất ca lỗi và kiểm tra evaluator | Tự chạy, ghi số ca/kết quả thực | Đang bắt đầu |
 | **Phase 8** | Live eval/logs | Lập ngân sách live | Chỉ hỗ trợ live sau cho phép rõ ràng | Tự cấp key, kiểm chứng và phân tích log | Chưa thực hiện; API khóa |
 | **Phase 9** | Report/README | Review Word 8–9 trang | Kiểm tra nội dung theo số liệu đã có | Viết failure/hạn chế/đóng góp thật | Chưa thực hiện |
 | **Phase 10** | Cold start/đóng gói/bảo vệ | Luyện vấn đáp/sửa code | Đặt câu hỏi và kiểm tra hồ sơ theo quyền | Tự giải thích, sửa code, commit và nộp | Chưa thực hiện |
