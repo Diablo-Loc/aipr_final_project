@@ -128,17 +128,42 @@
     Kết quả thực tế trên máy sinh viên: `Phase 4: PASS`.
 - **Trạng thái Phase 4:** **ĐÃ HOÀN THÀNH (PASSED)**.
 
+### Phase 5: MCP Server và MCP Client
+
+- **Công cụ:** Antigravity (Gemini).
+- **Phạm vi hỗ trợ:**
+  - Hướng dẫn kiến trúc giao tiếp `stdio` JSON-RPC giữa hai tiến trình độc lập, giữ sạch `stdout` và chuyển hướng log lỗi sang `.stderr.log`.
+  - Hướng dẫn thiết kế `src/mcp_server.py`: class `Service` quản lý 5 tools (`search_documents`, `get_document`, `analyze_progress`, `create_followup_request`, `get_followup_request`), cơ chế chặn an toàn 3 lớp trước khi ghi SQLite (`allow_write`, bắt buộc gọi `analyze_progress` trước, `risk == True`), trả về contract `verification` và bắt mọi exception trả về chuỗi `"Error: ..."`.
+  - Hướng dẫn thiết kế `src/mcp_client.py`: hàm `connect` tự mở subprocess server, gọi `session.list_tools()` để discover động danh sách công cụ và schema mà không hard-code.
+  - Hướng dẫn thiết kế `scripts/second_client.py` (điểm cộng Interop): host Python thứ hai độc lập kết nối tới MCP server.
+  - Hỗ trợ review mã nguồn do sinh viên tự tay gõ trong 3 file.
+- **Các prompt thực tế sinh viên đã gửi:**
+  1. *"ok tiếp tục phase 5"*
+  2. *"cả 2 lệnh đều pass hết rồi, check xem có lỗi gì không"*
+  3. *"đã fix xong, bạn update ai-usage.md"*
+- **Mã nguồn hoặc tài liệu có AI hỗ trợ:**
+  - `src/mcp_server.py`: AI gợi ý mã nguồn tham khảo từ nguyên mẫu kỹ thuật cho class `Service` và `build_server`.
+  - `src/mcp_client.py`: AI gợi ý mã nguồn tham khảo cho class `Tools` và context manager `connect`.
+  - `scripts/second_client.py`: AI gợi ý mã nguồn tham khảo cho host thứ hai kiểm thử tính tương thích liên thông (interoperability).
+- **Kiểm chứng thực tế của sinh viên:**
+  - Sinh viên tự tay gõ mã nguồn vào 3 file `src/mcp_server.py`, `src/mcp_client.py` và `scripts/second_client.py` (kèm chú thích giải thích trực tiếp trong code).
+  - Tự chỉnh sửa các lỗi typo (`"Error:"`, `.stderr.log`, `demo.sqlite`, mô tả tool).
+  - Chạy smoke test Phase 5 và Interop test tại terminal:
+    - Lệnh 1: kiểm tra discover đúng 5 tools, gọi tool không tồn tại trả về `'Error:'`, gọi ghi trước khi analyze trả về `'Error:'`, gọi analyze ra `behind_pp == 22`, gọi ghi và gọi tool đọc verify khớp hoàn toàn bản ghi: `Phase 5: PASS`.
+    - Lệnh 2 (`.\.venv\Scripts\python.exe run.py interop`): host thứ hai discover 5 tools và xác nhận `Interop write/read verification: PASS`.
+- **Trạng thái Phase 5:** **ĐÃ HOÀN THÀNH (PASSED)**.
+
 ---
 
-### Phase 5–10: Kế hoạch cập nhật tiếp theo
+### Phase 6–10: Kế hoạch cập nhật tiếp theo
 
 | Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
 |---|---|---|---|---|---|
 | **Phase 2** | models.py, data.py | Gợi ý schema/review code tay | Hướng dẫn cấu trúc & chỉ lỗi typo | Tự tay gõ, sửa lỗi và pass smoke test | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 3** | store.py, analyze | Giải thích phép tính/SQLite | Hướng dẫn RequestStore, công thức & SQLite | Tự gõ code, kiểm tra tính toán và lưu SQLite | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu tuần 4 / review code tay | Hướng dẫn RAG, BM25, API & review lỗi | Tự tay gõ 3 file, sửa lỗi và pass smoke test | ĐÃ HOÀN THÀNH (PASSED) |
-| **Phase 5** | MCP server/client | Giải thích stdio/discovery | Review schema/tool contract | Tự kiểm tra discovery, write → read | Đang bắt đầu |
-| **Phase 6** | agent/runtime/CLI | Giải thích loop và recovery | Review parser/permission/MAX_STEPS | Tự viết, giải thích, chạy offline | Chưa thực hiện |
+| **Phase 5** | MCP server/client, interop | Hướng dẫn stdio/discovery/review | Hướng dẫn 5 tools, client động, host thứ 2 & review | Tự tay gõ 3 file, sửa typo và pass cả 2 lệnh | ĐÃ HOÀN THÀNH (PASSED) |
+| **Phase 6** | agent/runtime/CLI | Giải thích loop và recovery | Review parser/permission/MAX_STEPS | Tự viết, giải thích, chạy offline | Đang bắt đầu |
 | **Phase 7** | Tests/evaluator | Review refusal/citation/metrics | Đề xuất ca lỗi và kiểm tra evaluator | Tự chạy, ghi số ca/kết quả thực | Chưa thực hiện |
 | **Phase 8** | Live eval/logs | Lập ngân sách live | Chỉ hỗ trợ live sau cho phép rõ ràng | Tự cấp key, kiểm chứng và phân tích log | Chưa thực hiện; API khóa |
 | **Phase 9** | Report/README | Review Word 8–9 trang | Kiểm tra nội dung theo số liệu đã có | Viết failure/hạn chế/đóng góp thật | Chưa thực hiện |
