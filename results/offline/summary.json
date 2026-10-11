@@ -1,0 +1,74 @@
+{
+  "backend": "offline",
+  "real_llm_evidence": false,
+  "runs": 1,
+  "source_log_files": [
+    "eval_offline_20261011T090858146657_1b17bf.jsonl"
+  ],
+  "configuration": {
+    "chunk_chars": 1000,
+    "embedding_model": "jina-embeddings-v3",
+    "judge_model": "openai/gpt-oss-20b",
+    "llm_model": "qwen/qwen3.8-27b",
+    "max_attempts": 3,
+    "max_steps": 8,
+    "python": "3.11.0",
+    "timeout_seconds": 30,
+    "top_k": 4
+  },
+  "configuration_complete": true,
+  "observed_models": {
+    "agent": [],
+    "judge": []
+  },
+  "modes": {
+    "dense": {
+      "cases": 12,
+      "functional_accuracy": 1.0,
+      "label_refusal_rate": 1.0,
+      "correct_refusal_rate": null,
+      "false_refusal_rate": 0.0,
+      "source_completeness_rate": 1.0,
+      "citation_support_rate": null,
+      "faithfulness": null,
+      "faithfulness_samples": 0,
+      "judge_errors": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "calls": 0,
+      "grounded_accuracy": null,
+      "judge_calls": 0,
+      "judge_prompt_tokens": 0,
+      "judge_completion_tokens": 0,
+      "embedding_calls": 0,
+      "embedding_tokens": 0,
+      "embedding_cache_hits": 65,
+      "embedding_attempts": 0,
+      "embedding_trace_complete": true
+    },
+    "hybrid": {
+      "cases": 12,
+      "functional_accuracy": 1.0,
+      "label_refusal_rate": 1.0,
+      "correct_refusal_rate": null,
+      "false_refusal_rate": 0.0,
+      "source_completeness_rate": 1.0,
+      "citation_support_rate": null,
+      "faithfulness": null,
+      "faithfulness_samples": 0,
+      "judge_errors": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "calls": 0,
+      "grounded_accuracy": null,
+      "judge_calls": 0,
+      "judge_prompt_tokens": 0,
+      "judge_completion_tokens": 0,
+      "embedding_calls": 0,
+      "embedding_tokens": 0,
+      "embedding_cache_hits": 76,
+      "embedding_attempts": 0,
+      "embedding_trace_complete": true
+    }
+  }
+}

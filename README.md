@@ -5,17 +5,17 @@ Sinh viên thực hiện: Độc lập (1 thành viên).
 
 ## Trạng thái và hướng dẫn tiếp tục
 
-Cập nhật tài liệu sau khi hoàn thành Phase 7. **Toàn bộ mã nguồn và kiểm thử Offline (Phase 1–7) đã hoàn tất; đang chuẩn bị sang Phase 8 (Live API).**
+Cập nhật tài liệu sau khi hoàn thành Phase 8. **Toàn bộ mã nguồn, kiểm thử Offline (Phase 1–7) và Thực nghiệm Live API (Phase 8: S1–S3, E1) đã hoàn tất.**
 
 | Hạng mục | Trạng thái hiện tại |
 |---|---|
 | Khung repo, launcher, config và dependency lock | Đã hoàn thành (`Python 3.11.0`, 45 packages locked) |
 | Corpus và provenance | Đã xác minh (`13` tài liệu hợp lệ, lọc phiên bản `supersedes` và `GLOBAL`/`P001`–`P003`) |
 | Code nghiệp vụ (`src/`, `scripts/`, `templates/`) | Đã hoàn thành đầy đủ (`models`, `data`, `store`, `hybrid`, `api`, `rag`, `mcp_server`, `mcp_client`, `runtime`, `agent`, `offline_model`, `cli`, `second_client`, `eval`) |
-| Kiểm thử Offline & Unit/Integration Tests | Đã PASS (`48/48` tests OK, `interop` PASS, `demo --backend offline` 4/4 PASS, `eval --backend offline --runs 1` 24/24 PASS — chi tiết tại [docs/VERIFICATION.md](docs/VERIFICATION.md)) |
-| API live (Phase 8) | ĐANG KHÓA, chỉ chạy sau khi sinh viên cấp `.env` và cho phép rõ ràng từng đợt |
+| Kiểm thử Offline & Unit/Integration Tests | Đã PASS (`48/48` tests OK, `interop` PASS, `demo --backend offline` 4/4 PASS, `eval --backend offline --runs 1` 24/24 PASS) |
+| Thực nghiệm Live API (Phase 8) | Đã hoàn thành 3 lượt Smoke (`S1`, `S2`, `S3`) và 1 lượt Full Eval (`E1`: 24/24 lượt trên Groq & Jina AI — chi tiết tại [docs/VERIFICATION.md](docs/VERIFICATION.md)) |
 
-**Việc tiếp theo:** Phase 8 — Chạy 3 lượt Smoke Live (`S1`, `S2`, `S3`) và 1 lượt Đánh giá thực nghiệm Live (`E1`: 12 câu × 2 modes = 24 lượt) với API thật sau khi sinh viên cấu hình `.env` và cấp quyền thực thi.
+**Việc tiếp theo:** Phase 9 & 10 — Hoàn thiện báo cáo kỹ thuật `report.docx` (8–9 trang) từ số liệu thực nghiệm đã đo, kiểm tra Cold Start và đóng gói nộp bài.
 
 Đọc theo thứ tự: [AGENTS.md](AGENTS.md) → [kiến trúc](docs/ARCHITECTURE.md) → [setup](docs/SETUP.md) → [kiểm chứng](docs/VERIFICATION.md) → [khai báo AI](ai-usage.md). Đây là bộ hướng dẫn local tối thiểu, không yêu cầu Docker/CI/Git Flow hay dịch vụ bên ngoài. Không copy PDF/sổ tay vào repo, không tự commit/push.
 

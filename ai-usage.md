@@ -199,9 +199,25 @@
   - Chạy lệnh `cmd /d /c "make eval --backend offline --runs 1"`: hoàn thành 24 lượt đánh giá (`12 dense + 12 hybrid`), cả hai chế độ đều đạt `functional_accuracy: 1.0`, `source_completeness_rate: 1.0`, `label_refusal_rate: 1.0`, `false_refusal_rate: 0.0`, các chỉ số LLM (`faithfulness`, `citation_support_rate`, `correct_refusal_rate`, `grounded_accuracy`) giữ nguyên `null`, sinh file log `logs/eval_offline_20261011T090858146657_1b17bf.jsonl` và bộ kết quả trong `results/offline/` (`per_query.csv`, `summary.json`, `accuracy.png`).
 - **Trạng thái Phase 7:** **ĐÃ HOÀN THÀNH (PASSED)**.
 
+### Phase 8: Thực nghiệm Live API (Smoke Runs S1–S3 và Đánh giá E1)
+
+- **Công cụ:** Antigravity (Gemini).
+- **Phạm vi hỗ trợ:**
+  - Hướng dẫn quy trình tạo file `.env` cục bộ an toàn (không mở/đọc giá trị API key) và chạy từng bước kiểm chứng thực nghiệm với API thật (`qwen/qwen3.8-27b` trên Groq, `openai/gpt-oss-20b` làm Judge trên Groq, `jina-embeddings-v3` trên Jina AI).
+  - Hỗ trợ kiểm tra tính toàn vẹn của 4 file log JSONL thực tế (`demo_live_20261011T094646647365.jsonl`, `demo_live_20261011T094808143956.jsonl`, `demo_live_20261011T094919566238.jsonl`, `eval_live_20261011T095314888391_572f75.jsonl`) và phân tích nguyên nhân các ca sai lệch thực tế giữa Agent và Judge LLM.
+- **Các prompt thực tế sinh viên đã gửi:**
+  1. *"ok tiếp tới phase 8 nào"*
+  2. *"ok chứ"* (gửi kèm kết quả chạy thật S1, S2, S3 và E1).
+- **Kiểm chứng thực tế của sinh viên trên API thật:**
+  - **Smoke S1 (`logs/demo_live_20261011T094646647365.jsonl`):** Trả lời đúng `Minh` phụ trách `T02` của `P001`, trích dẫn `P001-PLAN, P001-MEETING` (`calls: 1, prompt_tokens: 2895, completion_tokens: 119`).
+  - **Smoke S2 (`logs/demo_live_20261011T094808143956.jsonl`):** Agent tự gọi `get_document("P001-W2-V1", 1)`, chỉ ra `T02` tăng từ `50` lên `60` (`task_change_pp: 10`), chọn bản hiện hành `P001-W2-V2`, trích dẫn `P001-W2-V1, P001-W2-V2` (`calls: 2, prompt_tokens: 5791, completion_tokens: 351`).
+  - **Smoke S3 (`logs/demo_live_20261011T094919566238.jsonl`):** Chuỗi `analyze_progress` $\rightarrow$ `create_followup_request` $\rightarrow$ `get_followup_request` xác nhận `action_verified` cho `request_id: 8ddfc682-c592-484c-b6c1-c00df680b922` (`calls: 4, attempts: 6`, tự động vượt qua 2 lần rate limit HTTP 429 với `retry-after: 22.0s` và `35.0s`).
+  - **Evaluation E1 (`logs/eval_live_20261011T095314888391_572f75.jsonl` & `results/live/`):** Hoàn thành trọn vẹn 24/24 lượt (`12 dense + 12 hybrid`) với `judge_errors = 0`. Ghi nhận đầy đủ các ca tự phục hồi của Agent (`dense:Q05` tự sửa lỗi thiếu trích dẫn `POLICY-V2`) và các ca sai lệch của Judge (`Q11–Q14` trích xuất câu từ chối thành claim, `Q15` gán UUID `request_id` vào `source_ids`) vào `docs/VERIFICATION.md`.
+- **Trạng thái Phase 8:** **ĐÃ HOÀN THÀNH (PASSED)**.
+
 ---
 
-### Phase 8–10: Kế hoạch cập nhật tiếp theo
+### Phase 9–10: Kế hoạch cập nhật tiếp theo
 
 | Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
 |---|---|---|---|---|---|
@@ -211,8 +227,8 @@
 | **Phase 5** | MCP server/client, interop | Hướng dẫn stdio/discovery/review | Hướng dẫn 5 tools, client động, host thứ 2 & review | Tự tay gõ 3 file, sửa typo và pass cả 2 lệnh | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 6** | agent/runtime/CLI, offline_model | Giải thích loop/recovery & review code | Review code tay 3 file; ghi nhận copy offline_model & templates | Tự gõ runtime/agent/cli, sửa lỗi và pass demo offline | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 7** | scripts/eval.py, tests/ | Giải thích metrics/judge & review code | Ghép hạ tầng eval, copy 48 tests, review phần tự gõ | Tự gõ hàm chấm điểm/judge, pass 48/48 tests & eval offline | ĐÃ HOÀN THÀNH (PASSED) |
-| **Phase 8** | Live eval/logs | Lập ngân sách live | Chỉ hỗ trợ live sau cho phép rõ ràng | Tự cấp key, kiểm chứng và phân tích log | Chưa thực hiện; API khóa |
-| **Phase 9** | Report/README | Review Word 8–9 trang | Kiểm tra nội dung theo số liệu đã có | Viết failure/hạn chế/đóng góp thật | Chưa thực hiện |
+| **Phase 8** | Live eval/logs (`S1–S3`, `E1`) | Hướng dẫn chạy từng bước & phân tích log | Kiểm tra log thực tế, phân tích ca lỗi Agent/Judge | Tự cấu hình `.env`, chạy S1–S3 & E1 (24/24 lượt) | ĐÃ HOÀN THÀNH (PASSED) |
+| **Phase 9** | Report/README | Review Word 8–9 trang | Kiểm tra nội dung theo số liệu đã có | Viết failure/hạn chế/đóng góp thật | Đang bắt đầu |
 | **Phase 10** | Cold start/đóng gói/bảo vệ | Luyện vấn đáp/sửa code | Đặt câu hỏi và kiểm tra hồ sơ theo quyền | Tự giải thích, sửa code, commit và nộp | Chưa thực hiện |
 
 ---

@@ -1,0 +1,78 @@
+{
+  "backend": "live",
+  "real_llm_evidence": true,
+  "runs": 1,
+  "source_log_files": [
+    "eval_live_20261011T095314888391_572f75.jsonl"
+  ],
+  "configuration": {
+    "chunk_chars": 1000,
+    "embedding_model": "jina-embeddings-v3",
+    "judge_model": "openai/gpt-oss-20b",
+    "llm_model": "qwen/qwen3.8-27b",
+    "max_attempts": 3,
+    "max_steps": 8,
+    "python": "3.11.0",
+    "timeout_seconds": 30,
+    "top_k": 4
+  },
+  "configuration_complete": true,
+  "observed_models": {
+    "agent": [
+      "qwen/qwen3.8-27b"
+    ],
+    "judge": [
+      "openai/gpt-oss-20b"
+    ]
+  },
+  "modes": {
+    "dense": {
+      "cases": 12,
+      "functional_accuracy": 0.6666666666666666,
+      "label_refusal_rate": 1.0,
+      "correct_refusal_rate": 0.0,
+      "false_refusal_rate": 0.0,
+      "source_completeness_rate": 1.0,
+      "citation_support_rate": 0.5833333333333334,
+      "faithfulness": 0.75,
+      "faithfulness_samples": 12,
+      "judge_errors": 0,
+      "prompt_tokens": 73096,
+      "completion_tokens": 3104,
+      "calls": 24,
+      "grounded_accuracy": 0.5833333333333334,
+      "judge_calls": 12,
+      "judge_prompt_tokens": 19792,
+      "judge_completion_tokens": 2881,
+      "embedding_calls": 12,
+      "embedding_tokens": 580,
+      "embedding_cache_hits": 77,
+      "embedding_attempts": 12,
+      "embedding_trace_complete": true
+    },
+    "hybrid": {
+      "cases": 12,
+      "functional_accuracy": 0.6666666666666666,
+      "label_refusal_rate": 1.0,
+      "correct_refusal_rate": 0.0,
+      "false_refusal_rate": 0.0,
+      "source_completeness_rate": 1.0,
+      "citation_support_rate": 0.5,
+      "faithfulness": 0.7916666666666666,
+      "faithfulness_samples": 12,
+      "judge_errors": 0,
+      "prompt_tokens": 65031,
+      "completion_tokens": 2800,
+      "calls": 22,
+      "grounded_accuracy": 0.5,
+      "judge_calls": 12,
+      "judge_prompt_tokens": 18827,
+      "judge_completion_tokens": 2681,
+      "embedding_calls": 0,
+      "embedding_tokens": 0,
+      "embedding_cache_hits": 83,
+      "embedding_attempts": 0,
+      "embedding_trace_complete": true
+    }
+  }
+}
