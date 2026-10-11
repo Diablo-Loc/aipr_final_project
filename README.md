@@ -5,20 +5,19 @@ Sinh viên thực hiện: Độc lập (1 thành viên).
 
 ## Trạng thái và hướng dẫn tiếp tục
 
-Cập nhật tài liệu ngày 08/10/2026. **Đang triển khai, chưa phải bản nộp cuối.** Phạm vi dưới đây là mục tiêu đã chốt, không phải tuyên bố mọi chức năng đã chạy.
+Cập nhật tài liệu sau khi hoàn thành Phase 7. **Toàn bộ mã nguồn và kiểm thử Offline (Phase 1–7) đã hoàn tất; đang chuẩn bị sang Phase 8 (Live API).**
 
-| Hạng mục | Trạng thái tại lần cập nhật này |
+| Hạng mục | Trạng thái hiện tại |
 |---|---|
-| Khung repo, launcher, config và dependency lock | Đã có file; tồn tại .git/.venv |
-| Setup, pip check, commit đầu | Sinh viên đã ghi hoàn thành trong ai-usage; AI không chạy lại hoặc kiểm tra Git history trong lượt này |
-| Corpus và provenance | Đã có file; chưa xác minh bằng loader của repo thật |
-| Code nghiệp vụ | src hiện có __init__.py; models/data/store/RAG/MCP/agent chưa viết |
-| Tests, demo, evaluation và report của repo thật | Chưa có bằng chứng kiểm chứng trong lượt này; không lấy kết quả của mock |
-| API live | KHÓA, cần sinh viên cho phép rõ ràng trước từng đợt |
+| Khung repo, launcher, config và dependency lock | Đã hoàn thành (`Python 3.11.0`, 45 packages locked) |
+| Corpus và provenance | Đã xác minh (`13` tài liệu hợp lệ, lọc phiên bản `supersedes` và `GLOBAL`/`P001`–`P003`) |
+| Code nghiệp vụ (`src/`, `scripts/`, `templates/`) | Đã hoàn thành đầy đủ (`models`, `data`, `store`, `hybrid`, `api`, `rag`, `mcp_server`, `mcp_client`, `runtime`, `agent`, `offline_model`, `cli`, `second_client`, `eval`) |
+| Kiểm thử Offline & Unit/Integration Tests | Đã PASS (`48/48` tests OK, `interop` PASS, `demo --backend offline` 4/4 PASS, `eval --backend offline --runs 1` 24/24 PASS — chi tiết tại [docs/VERIFICATION.md](docs/VERIFICATION.md)) |
+| API live (Phase 8) | ĐANG KHÓA, chỉ chạy sau khi sinh viên cấp `.env` và cho phép rõ ràng từng đợt |
 
-**Việc tiếp theo:** Phase 2 — sinh viên tự viết src/models.py và src/data.py, đọc/validate corpus và phiên bản; kiểm tra phần này offline trước khi sang phép tính/SQLite. AI giải thích hoặc sửa code theo yêu cầu cụ thể, không tự viết toàn bộ đồ án.
+**Việc tiếp theo:** Phase 8 — Chạy 3 lượt Smoke Live (`S1`, `S2`, `S3`) và 1 lượt Đánh giá thực nghiệm Live (`E1`: 12 câu × 2 modes = 24 lượt) với API thật sau khi sinh viên cấu hình `.env` và cấp quyền thực thi.
 
-Đọc theo thứ tự: [AGENTS.md](AGENTS.md) → [kiến trúc](docs/ARCHITECTURE.md) → [setup](docs/SETUP.md) → [khai báo AI](ai-usage.md). Đây là bộ hướng dẫn local tối thiểu, không yêu cầu Docker/CI/Git Flow hay dịch vụ bên ngoài. Không copy PDF/sổ tay vào repo, không tự commit/push.
+Đọc theo thứ tự: [AGENTS.md](AGENTS.md) → [kiến trúc](docs/ARCHITECTURE.md) → [setup](docs/SETUP.md) → [kiểm chứng](docs/VERIFICATION.md) → [khai báo AI](ai-usage.md). Đây là bộ hướng dẫn local tối thiểu, không yêu cầu Docker/CI/Git Flow hay dịch vụ bên ngoài. Không copy PDF/sổ tay vào repo, không tự commit/push.
 
 ## 1. Mục tiêu và phạm vi đề tài
 Xây dựng trợ lý AI phân tích tiến độ dự án theo 3 tầng bắt buộc của yêu cầu đồ án:

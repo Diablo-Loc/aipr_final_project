@@ -176,9 +176,32 @@
     - Kịch bản D4 (*"Nếu P001 vượt ngưỡng ngày 08/10/2026, hãy tạo yêu cầu xử lý và xác nhận đã lưu."*): trả về `[offline / action_verified]` kèm `request_id` đã đối chiếu khớp trong SQLite và xuất file trace `logs/demo_offline_20261010T165849710869.jsonl`.
 - **Trạng thái Phase 6:** **ĐÃ HOÀN THÀNH (PASSED)**.
 
+### Phase 7: Kiểm thử tự động (Unit/Integration Tests) và Đánh giá Offline (`scripts/eval.py`)
+
+- **Công cụ:** Antigravity (Gemini).
+- **Phạm vi hỗ trợ:**
+  - Giải thích phương pháp đánh giá thực nghiệm 2 chế độ (`dense` vs `hybrid`) trên tập 12 câu hỏi chuẩn (`tests/testset.jsonl`): cách tính `functional_score`, sự khác biệt giữa `label_refusal_rate` và `correct_refusal_rate`, cơ chế LLM-as-a-Judge tách mệnh đề (`claims`) để chấm `faithfulness` và `citation_support` dựa hoàn toàn trên `observations` (không dùng ground truth làm bằng chứng), và nguyên tắc không gán điểm LLM giả lập cho các lần chạy `offline` (`faithfulness = null`, `grounded_accuracy = null`).
+  - Hỗ trợ ghép phần khung hạ tầng đọc/ghi log, tính chữ ký `snapshot_signature`, resume checkpoint, xuất bảng CSV/JSON và vẽ biểu đồ `matplotlib` vào `scripts/eval.py` để sinh viên tập trung tự gõ phần thuật toán chấm điểm cốt lõi.
+  - Review phần mã nguồn do sinh viên tự gõ (dòng 1–73 của `scripts/eval.py`) và phát hiện lỗi thiếu chữ `s` tại dòng 15 (`Path(__file__).resolve().parent[1]` -> `parents[1]`) để sinh viên tự sửa trước khi chạy test.
+- **Các prompt thực tế sinh viên đã gửi:**
+  1. *"ok rồi, giải thích này đi, trước khi qua phase 7"*
+  2. *"ok tiếp phase 7"*
+  3. *"trong tài liệu yêu cầu và khác thì có bắt buộc phải tự tay viết và nên tự viết file scripts/eval.py"*
+  4. *"phương án A đi"*
+  5. *"đã gõ xong, bạn check kỹ và tiếp tục"*
+- **Mã nguồn hoặc tài liệu có AI hỗ trợ (phân biệt rõ phần tự gõ và phần tái sử dụng):**
+  - `scripts/eval.py` (Phần 1, dòng 1–73): **Sinh viên tự tay gõ** phần khai báo import và 3 hàm chấm điểm cốt lõi (`same`, `functional_score`, `judge`), tự sửa lỗi `.parents[1]` ở dòng 15 sau khi AI review.
+  - `scripts/eval.py` (Phần 2, dòng 75–301): **Tái sử dụng từ nguyên mẫu kỹ thuật** cho phần hạ tầng quản lý chữ ký snapshot, resume checkpoint, đọc/ghi log JSONL (`rows_from_log`), tổng hợp bảng kết quả (`write_results`) và vẽ biểu đồ `matplotlib`.
+  - `tests/testset.jsonl`, `tests/test_core.py`, `tests/test_eval.py`, `tests/test_audit.py`: **Sao chép (tái sử dụng nguyên bản) từ nguyên mẫu kỹ thuật** để kiểm thử hồi quy toàn bộ mã nguồn dự án.
+- **Kiểm chứng thực tế của sinh viên:**
+  - Kiểm tra cấu trúc `tests/testset.jsonl`: xác nhận đủ 12 câu hỏi (gồm 4 câu `no_answer`, 1 câu `insufficient_data`), đầy đủ `expected_sources` (`Testset: PASS`).
+  - Chạy lệnh `.\.venv\Scripts\python.exe run.py test`: chạy **48 bài kiểm thử** (unit & integration tests trong `test_audit.py`, `test_core.py`, `test_eval.py`, dùng mock/stub không nạp `.env` thật) và đạt **48/48 PASS trong 2.336s (`OK`)**.
+  - Chạy lệnh `cmd /d /c "make eval --backend offline --runs 1"`: hoàn thành 24 lượt đánh giá (`12 dense + 12 hybrid`), cả hai chế độ đều đạt `functional_accuracy: 1.0`, `source_completeness_rate: 1.0`, `label_refusal_rate: 1.0`, `false_refusal_rate: 0.0`, các chỉ số LLM (`faithfulness`, `citation_support_rate`, `correct_refusal_rate`, `grounded_accuracy`) giữ nguyên `null`, sinh file log `logs/eval_offline_20261011T090858146657_1b17bf.jsonl` và bộ kết quả trong `results/offline/` (`per_query.csv`, `summary.json`, `accuracy.png`).
+- **Trạng thái Phase 7:** **ĐÃ HOÀN THÀNH (PASSED)**.
+
 ---
 
-### Phase 7–10: Kế hoạch cập nhật tiếp theo
+### Phase 8–10: Kế hoạch cập nhật tiếp theo
 
 | Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
 |---|---|---|---|---|---|
@@ -187,7 +210,7 @@
 | **Phase 4** | api.py, hybrid.py, rag.py | Đối chiếu tuần 4 / review code tay | Hướng dẫn RAG, BM25, API & review lỗi | Tự tay gõ 3 file, sửa lỗi và pass smoke test | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 5** | MCP server/client, interop | Hướng dẫn stdio/discovery/review | Hướng dẫn 5 tools, client động, host thứ 2 & review | Tự tay gõ 3 file, sửa typo và pass cả 2 lệnh | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 6** | agent/runtime/CLI, offline_model | Giải thích loop/recovery & review code | Review code tay 3 file; ghi nhận copy offline_model & templates | Tự gõ runtime/agent/cli, sửa lỗi và pass demo offline | ĐÃ HOÀN THÀNH (PASSED) |
-| **Phase 7** | Tests/evaluator | Review refusal/citation/metrics | Đề xuất ca lỗi và kiểm tra evaluator | Tự chạy, ghi số ca/kết quả thực | Đang bắt đầu |
+| **Phase 7** | scripts/eval.py, tests/ | Giải thích metrics/judge & review code | Ghép hạ tầng eval, copy 48 tests, review phần tự gõ | Tự gõ hàm chấm điểm/judge, pass 48/48 tests & eval offline | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 8** | Live eval/logs | Lập ngân sách live | Chỉ hỗ trợ live sau cho phép rõ ràng | Tự cấp key, kiểm chứng và phân tích log | Chưa thực hiện; API khóa |
 | **Phase 9** | Report/README | Review Word 8–9 trang | Kiểm tra nội dung theo số liệu đã có | Viết failure/hạn chế/đóng góp thật | Chưa thực hiện |
 | **Phase 10** | Cold start/đóng gói/bảo vệ | Luyện vấn đáp/sửa code | Đặt câu hỏi và kiểm tra hồ sơ theo quyền | Tự giải thích, sửa code, commit và nộp | Chưa thực hiện |
