@@ -38,6 +38,18 @@ cmd /d /c "make eval"
 
 Số liệu E1 ngày 11/10/2026 đã có trong repo và báo cáo: functional 8/12 mỗi mode, grounded 7/12 dense và 6/12 hybrid, mean faithfulness 0,7500 và 0,7917; correct refusal theo judge 0/4. Các bất đồng judge được phân tích trong báo cáo. Lượt API mới có thể cho câu trả lời/token/điểm khác; giữ log gốc để đối chiếu, không tự sửa kết quả cũ thành đạt.
 
+## Chạy câu hỏi tại buổi bảo vệ
+
+Sau khi đã cài đặt, thay nội dung trong dấu ngoặc kép bằng câu hỏi giảng viên đưa tại chỗ, ngoài testset:
+
+```powershell
+cmd /d /c 'make demo --query "P002 ngày 08/10/2026 có chậm tiến độ hoặc có công việc quá hạn không?"'
+```
+
+Ví dụ trên không có trong `tests/testset.jsonl`; kết quả cần đối chiếu là kế hoạch 70%, thực tế 75%, đi trước 5 điểm phần trăm và không có công việc quá hạn. Nếu câu hỏi yêu cầu tạo phiếu, thêm `--allow-write` vào cuối lệnh. Chương trình in câu trả lời, nguồn, USAGE và đường dẫn trace như demo mặc định.
+
+Ba lệnh trong README phục vụ ba việc riêng: cài đặt kèm demo, đánh giá và hỏi một câu tùy chọn; không phải chạy liên tiếp cả ba để khởi động. Demo và đánh giá mặc định dùng API thật, chỉ chạy khi người dùng chủ động và có quota. Các lệnh `test`, `interop` và tùy chọn offline dành cho kiểm thử/phát triển, không cần chạy để mở demo; xem `docs/SETUP.md` khi cần.
+
 ## Tệp chính
 
 - `src/`: schema, corpus, RAG, API, agent, MCP server/client và SQLite.
