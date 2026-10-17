@@ -38,17 +38,31 @@ cmd /d /c "make eval"
 
 Số liệu E1 ngày 11/10/2026 đã có trong repo và báo cáo: functional 8/12 mỗi mode, grounded 7/12 dense và 6/12 hybrid, mean faithfulness 0,7500 và 0,7917; correct refusal theo judge 0/4. Các bất đồng judge được phân tích trong báo cáo. Lượt API mới có thể cho câu trả lời/token/điểm khác; giữ log gốc để đối chiếu, không tự sửa kết quả cũ thành đạt.
 
-## Chạy câu hỏi tại buổi bảo vệ
+## Chạy câu hỏi tùy chọn
 
-Sau khi đã cài đặt, thay nội dung trong dấu ngoặc kép bằng câu hỏi giảng viên đưa tại chỗ, ngoài testset:
+Sau khi đã cài đặt, dùng mẫu sau và thay `NỘI DUNG CÂU HỎI` bằng câu bạn muốn hỏi. Câu hỏi không cần có sẵn trong testset; khi bảo vệ, nhập câu hỏi giảng viên đưa tại chỗ:
 
 ```powershell
-cmd /d /c 'make demo --query "P002 ngày 08/10/2026 có chậm tiến độ hoặc có công việc quá hạn không?"'
+cmd /d /c 'make demo --query "NỘI DUNG CÂU HỎI"'
 ```
 
-Ví dụ trên không có trong `tests/testset.jsonl`; kết quả cần đối chiếu là kế hoạch 70%, thực tế 75%, đi trước 5 điểm phần trăm và không có công việc quá hạn. Nếu câu hỏi yêu cầu tạo phiếu, thêm `--allow-write` vào cuối lệnh. Chương trình in câu trả lời, nguồn, USAGE và đường dẫn trace như demo mặc định.
+Nếu cho phép tạo phiếu, thêm `--allow-write` ngay sau dấu ngoặc kép đóng câu hỏi, trước dấu nháy đơn cuối lệnh: `cmd /d /c 'make demo --query "NỘI DUNG CÂU HỎI" --allow-write'`. Quyền ghi không bỏ qua việc kiểm tra dữ liệu và rủi ro.
 
-Ba lệnh trong README phục vụ ba việc riêng: cài đặt kèm demo, đánh giá và hỏi một câu tùy chọn; không phải chạy liên tiếp cả ba để khởi động. Demo và đánh giá mặc định dùng API thật, chỉ chạy khi người dùng chủ động và có quota. Các lệnh `test`, `interop` và tùy chọn offline dành cho kiểm thử/phát triển, không cần chạy để mở demo; xem `docs/SETUP.md` khi cần.
+Ví dụ thuộc phạm vi đồ án (kết quả dưới đây là kỳ vọng để đối chiếu, không phải kết quả của lượt API mới):
+
+| Loại | Nội dung câu hỏi thay vào mẫu | Kết quả cần đối chiếu |
+|---|---|---|
+| Tra cứu | Ai phụ trách T03 của P001? | Lan, có nguồn |
+| Phiên bản | Báo cáo P001 ngày 08/10/2026 phiên bản v1 và v2 khác gì? Dùng bản nào? | T02 từ 50% lên 60%; dùng v2, dẫn cả hai bản khi so sánh |
+| Tính toán | P001 ngày 08/10/2026 chậm bao nhiêu so với kế hoạch? | Kế hoạch 70%, thực tế 48%, chậm 22 điểm phần trăm |
+| Không có rủi ro | P002 ngày 08/10/2026 có chậm tiến độ hoặc có công việc quá hạn không? | Thực tế 75%, kế hoạch 70%, đi trước 5 điểm phần trăm; không quá hạn |
+| Thiếu dữ liệu | Tính tiến độ tổng P003 ngày 08/10/2026. | `insufficient_data`, thiếu tiến độ thực tế T02 |
+| Không có đáp án | Ngân sách đã chi của P001 là bao nhiêu? | `no_answer`, không đoán ngân sách |
+| Hành động | Nếu P001 vượt ngưỡng ngày 08/10/2026, hãy tạo yêu cầu xử lý và xác nhận đã lưu. | Cần `--allow-write`; chỉ báo `action_verified` khi ghi và đọc lại khớp |
+
+Chương trình in câu trả lời, nguồn, USAGE và đường dẫn trace như demo mặc định. Có thể hỏi cách diễn đạt khác; câu trả lời vẫn phụ thuộc dữ liệu hiện có, không phải câu hỏi nào cũng có đáp án.
+
+Ba cách chạy chính phục vụ ba việc riêng: cài đặt kèm demo, đánh giá và hỏi một câu tùy chọn; không phải chạy liên tiếp cả ba để khởi động. Demo và đánh giá mặc định dùng API thật, chỉ chạy khi người dùng chủ động và có quota. Các lệnh `test`, `interop` và tùy chọn offline dành cho kiểm thử/phát triển, không cần chạy để mở demo; xem `docs/SETUP.md` khi cần.
 
 ## Tệp chính
 
