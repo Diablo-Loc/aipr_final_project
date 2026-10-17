@@ -217,7 +217,16 @@
 
 ---
 
-### Phase 9–10: Kế hoạch cập nhật tiếp theo
+### Audit và chuẩn bị báo cáo Phase 9 ngày 11/10/2026
+
+- **Công cụ:** OpenAI Codex.
+- **Yêu cầu thực tế:** audit lại repo thật sau Phase 8; đồng bộ các tài liệu vận hành.
+- **Kiểm chứng audit thực tế:** 48/48 tests OK, 2,126 giây; interop write/read equality PASS; Python 3.11.0, pip check OK; 44 locked distributions không lệch phiên bản. Signature E1 khớp source, CSV/summary replay khớp gốc. Đây không phải lượt API live mới.
+- **Giới hạn đánh giá:** giữ nguyên raw E1, không biến 24/24 lượt hoàn tất thành 100% functional/grounded. Source completeness summary là 7/7; các bất đồng refusal/UUID/date của judge được phân tích riêng. Không đổi log/results hoặc source để làm đẹp số đo.
+- **Quyền và phạm vi:** không gọi API thật, không đọc .env/key, không commit/push; công cụ dựng/render Word nằm ngoài repo. Không sửa source nghiệp vụ/config/prompts/evaluator.
+- **Trách nhiệm sinh viên còn lại:** kiểm tra 8–9 trang trên Word của mình, đặt report.docx tại root repo, cập nhật trạng thái đã duyệt rồi tự commit. Chưa xác nhận cold start/bảo vệ hay Phase 9 cuối đã hoàn thành.
+
+### Phase 9–10 và trạng thái các mốc
 
 | Phase | Thành phần dự kiến | Tóm tắt prompt chính dự kiến | Nội dung AI hỗ trợ | Trách nhiệm của sinh viên | Trạng thái |
 |---|---|---|---|---|---|
@@ -228,7 +237,7 @@
 | **Phase 6** | agent/runtime/CLI, offline_model | Giải thích loop/recovery & review code | Review code tay 3 file; ghi nhận copy offline_model & templates | Tự gõ runtime/agent/cli, sửa lỗi và pass demo offline | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 7** | scripts/eval.py, tests/ | Giải thích metrics/judge & review code | Ghép hạ tầng eval, copy 48 tests, review phần tự gõ | Tự gõ hàm chấm điểm/judge, pass 48/48 tests & eval offline | ĐÃ HOÀN THÀNH (PASSED) |
 | **Phase 8** | Live eval/logs (`S1–S3`, `E1`) | Hướng dẫn chạy từng bước & phân tích log | Kiểm tra log thực tế, phân tích ca lỗi Agent/Judge | Tự cấu hình `.env`, chạy S1–S3 & E1 (24/24 lượt) | ĐÃ HOÀN THÀNH (PASSED) |
-| **Phase 9** | Report/README | Review Word 8–9 trang | Kiểm tra nội dung theo số liệu đã có | Viết failure/hạn chế/đóng góp thật | Đang bắt đầu |
+| **Phase 9** | Report/README | Rà Word sinh viên, đối chiếu yêu cầu, đồng bộ tài liệu | Rà source/evidence, sửa tối thiểu report.docx, chuẩn bị checklist/commit | Mở Word duyệt, tự commit và push | report.docx đã rà 17/10; chờ duyệt/commit |
 | **Phase 10** | Cold start/đóng gói/bảo vệ | Luyện vấn đáp/sửa code | Đặt câu hỏi và kiểm tra hồ sơ theo quyền | Tự giải thích, sửa code, commit và nộp | Chưa thực hiện |
 
 ---

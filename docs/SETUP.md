@@ -1,6 +1,6 @@
 # Setup và tiếp tục trên máy Windows khác
 
-Lệnh trong tài liệu là hướng dẫn, chưa được chạy trong lần bổ sung tài liệu này. Xem README để biết module nào đã có; không chạy demo/eval khi source còn thiếu.
+Tài liệu đồng bộ ngày 17/10/2026. Source và bộ offline đã triển khai; các kiểm chứng local và E1 đã ghi ở VERIFICATION.md/AUDIT_PHASE8_20261011.md. Không coi việc cập nhật hướng dẫn là chạy lại lệnh; cold start trên môi trường sạch/máy giảng viên vẫn chưa kiểm chứng.
 
 ## Điều kiện
 
@@ -30,7 +30,7 @@ Kỳ vọng Python 3.11.x và pip không báo dependency bị hỏng. Nếu khô
 
 ## Offline sau khi viết đủ module
 
-Chỉ chạy test khi có ca test thực sự; báo Ran 0 tests không phải bằng chứng đạt. CLI cần agent/MCP/RAG và prompts; eval cần scripts/eval.py cùng testset. Hiện các phần này chưa được viết tại snapshot tài liệu.
+CLI, agent/MCP/RAG, prompts, scripts/eval.py và testset đã có. Suite hiện có 48 ca; báo Ran 0 tests không phải bằng chứng đạt. Chỉ chạy lại khi có thay đổi hoặc bước kiểm chứng cần thiết, luôn chỉ định backend offline cho demo/eval.
 
 ```powershell
 # OFFLINE: chỉ sau khi các module/test của phase tương ứng đã đủ.
@@ -72,7 +72,8 @@ cmd /d /c "make setup && make demo"
 cmd /d /c "make eval"
 ```
 
-Hai lệnh là hai tác vụ khác nhau, không phải quyền tự động chạy cả hai. Sinh viên tự cấp key; AI không đọc/hiển thị file key hay dump môi trường. Không tự chạy preflight/judge/live khi quota hồi phục. Chốt số lượt/ngân sách trước mỗi đợt và dừng khi lỗi/quota, ghi đúng phần chưa hoàn tất. Hiện chưa xác minh API thật hoặc chạy trên máy bảo vệ.
+Hai lệnh là hai tác vụ khác nhau, không phải quyền tự động chạy cả hai. Sinh viên tự cấp key; AI không đọc/hiển thị file key hay dump môi trường. Không tự chạy preflight/judge/live khi quota hồi phục. E1 và ba smoke live đã chạy ngày 11/10; S1 hiện chỉ còn trong HEAD, S2/S3/E1 còn ở working tree. Lượt API mới vẫn cần cho phép riêng. Chưa chạy trên máy bảo vệ. Không dùng target audit/report/preflight trong launcher vì các script phụ tương ứng chưa có; không cần bổ sung chúng để hoàn thành môn.
+
 
 ## Bàn giao cho AI trên máy mới
 

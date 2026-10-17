@@ -1,6 +1,6 @@
 # Kiến trúc đồ án AIPR
 
-Thiết kế chốt ngày 08/10/2026, dựa trên mock đã sửa audit. Đây là kiến trúc đích; xem README để biết phần nào đã hiện thực tại repo thật. Tài liệu thiết kế là đề xuất tổ chức, không phải tiêu chí chấm riêng.
+Thiết kế chốt ngày 08/10/2026, sơ đồ đối chiếu lại source ngày 12/10/2026. Các module mô tả dưới đây đã triển khai và kiểm chứng offline; E1 live đã hoàn tất, có sai lệch judge được ghi riêng. Tài liệu thiết kế là cách tổ chức, không phải tiêu chí chấm riêng.
 
 ## Bài toán và giới hạn
 
@@ -9,22 +9,40 @@ Trợ lý AI hỗ trợ quản lý và phân tích tiến độ dự án bằng 
 Ba tầng: đọc kế hoạch/báo cáo/quy tắc có nguồn → tính tiến độ/chênh lệch/quá hạn → theo yêu cầu được phép tạo yêu cầu xử lý rủi ro vào SQLite và đọc xác minh.
 
 ```mermaid
-flowchart LR
-    CLI[CLI] --> Agent[Agent loop]
-    Agent --> LLM[LLM adapter hoặc stub offline]
-    Agent --> Client[MCP client: discover tools]
-    Client -->|stdio| Server[MCP server]
-    Server --> RAG[Dense / Hybrid RAG]
-    Server --> Analysis[Phân tích tiến độ]
-    Server --> Store[SQLite write / read]
-    RAG --> Corpus[Corpus có metadata và version]
-    Analysis --> Corpus
-    RAG --> Embedding[Embedding adapter hoặc stub offline]
+flowchart TB
+    subgraph Host[Tiến trình host]
+        CLI[CLI.ask] -->|connect trước run_agent| Client[MCP client và ClientSession]
+        CLI -->|sau initialize và list_tools| Agent[run_agent]
+        Agent --> Model[LiveModel.complete hoặc OfflineModel.complete]
+        Agent -->|bootstrap, tool, read verify| Client
+    end
+    subgraph MCP[Tiến trình MCP server]
+        Server[call_tool: validate và dispatch handler]
+        Server -->|search_documents| RAG[Retriever.search]
+        Server -->|get_document| Get[Corpus.get]
+        Server -->|analyze_progress| Analysis[Service.analyze]
+        Server -->|create_followup_request| Write[Service.create]
+        Server -->|get_followup_request| Read[RequestStore.get]
+        RAG --> Eligible[Corpus.eligible]
+        RAG --> Embed[Embedder.embed: cache, Jina live hoặc hash offline]
+        Analysis --> Calculate[Corpus.analyze]
+        Write -->|tính lại| Calculate
+        Write -->|đủ quyền, analysis cùng dự án/ngày, status ok và risk| Save[RequestStore.create]
+        Save --> DB[(SQLite)]
+        Read --> DB
+    end
+    Client -->|stdio: session.call_tool| Server
 ```
+
+Mũi tên thể hiện lời gọi hoặc đường dispatch; kết quả trở về qua cùng kết nối. `Service` tạo một `Corpus` và truyền cùng đối tượng đó vào `Retriever` (`mcp_server.py:19–22`); các ô `Corpus.get`, `Corpus.eligible`, `Corpus.analyze` là phương thức của đối tượng chung, không phải ba nguồn dữ liệu. Corpus nạp `data/corpus.jsonl`; SQLite chỉ lưu phiếu xử lý.
+
+`CLI.ask` mở `connect` trước `run_agent` (`cli.py:19–20`); client initialize/list_tools ở `mcp_client.py:68–71`. Agent gọi search ban đầu trước LLM (`agent.py:76–89`). `Service.create` tự gọi `Corpus.analyze` rồi kiểm tra điều kiện trước `RequestStore.create` (`mcp_server.py:31–41`); không có đường gọi trực tiếp từ dispatcher tới thao tác ghi SQLite. Sau ghi, host gọi tool đọc ngay và so toàn bộ record (`agent.py:193–211`), không chờ LLM chọn bước verify.
+
+LLM adapter thuộc host; embedding thuộc server. API mô hình là dịch vụ ngoài, không phải tiến trình MCP thứ ba của chương trình. Judge chỉ ở `scripts/eval.py`, chạy sau `ask` khi evaluation live; `final_answer` là schema trả lời cục bộ, không phải MCP tool thứ sáu. Sơ đồ không mô tả mọi nhánh lỗi hoặc nội bộ SDK; các phần đó được giải thích trong source và phần agent/MCP của report.
 
 Adapter live chỉ hoạt động khi có quyền; offline không nạp file key. Logs ghi config/revision, actions, tool observations và usage; không ghi credentials.
 
-## Trách nhiệm module dự kiến
+## Trách nhiệm module
 
 | File | Trách nhiệm |
 |---|---|
@@ -39,7 +57,7 @@ Adapter live chỉ hoạt động khi có quyền; offline không nạp file key
 | src/runtime.py, src/cli.py | Cấu hình runtime riêng cho live và điều phối CLI |
 | src/offline_model.py | Stub kiểm tra luồng; không thay bằng chứng LLM thật |
 | scripts/eval.py | Testset hai mode, chấm refusal/citation/faithfulness, tổng hợp từ log |
-| scripts/second_client.py | Host MCP thứ hai nhỏ, phần điểm cộng dự kiến |
+| scripts/second_client.py | Host MCP thứ hai nhỏ, đã kiểm chứng discover/write/read offline |
 | run.py, make.cmd, Makefile | Bootstrap và launcher; không chứa logic nghiệp vụ |
 | templates/, data/, tests/ | Prompt ngoài code, corpus/provenance, testset và tests |
 
@@ -77,11 +95,11 @@ Nguồn gốc: 01-De-tai-upload-for-student.pdf và 02-Yeu-cau-Thuc-hien.pdf. Th
 | Python 3.11+, typing, handwritten loop, retry/timeout, prompt ngoài code | Source, lock, templates, tests lỗi/MAX_STEPS |
 | Dense + hybrid tái dùng tuần 4; metadata/version | hybrid/provenance, citation, giải thích chunking trong report |
 | MCP stdio ≥2 tool, ≥1 write, stdout sạch, discovery | Năm tool theo bảng trên và trace/interop |
-| Testset ≥12, ≥4 no_answer; faithfulness/refusal/USAGE | Bộ chính dự kiến 12 câu × hai mode = 24 lượt; số đo thật |
+| Testset ≥12, ≥4 no_answer; faithfulness/refusal/USAGE | Bộ chính 12 câu × hai mode = 24 lượt; E1/CSV/summary thật |
 | ≥3 lần chạy thật có JSONL | Ba run độc lập đúng revision/config; resume không thành run mới |
 | report.docx 8–9 trang, failure/hạn chế/đóng góp/phụ lục | Report số liệu thật, ≥1 failure analysis, ≥2 hạn chế, commit cá nhân |
 | Repo .git, README setup/demo/eval, ai-usage và bảo vệ/sửa code | Repo/history thật, cold start và sinh viên tự giải thích |
 
 Điểm cộng được liệt kê: metadata filter, so sánh cấu hình, host thứ hai, CSV/đồ thị. Không tự hứa đủ +6 vì bảng chỉ liệt kê bốn mục +1. Số unit tests của mock, LLM judge tự động và công cụ sinh Word không phải điều kiện bắt buộc riêng của môn.
 
-Evaluation phải kiểm tra nội dung refusal, claim/citation và expected_sources; chỉ đúng status hoặc đúng doc_id chưa đủ. Offline có thể kiểm tra luồng/sources, nhưng không sinh điểm faithfulness/correct refusal của LLM thật. Dùng config gốc trong run log và tách embedding usage khỏi LLM/judge usage. Live đang chờ quyền và chưa có bằng chứng ở repo này.
+Evaluation kiểm tra nội dung refusal, claim/citation và expected_sources; chỉ đúng status hoặc đúng doc_id chưa đủ. Offline kiểm tra luồng/sources, không sinh điểm faithfulness/correct refusal của LLM thật. E1 live có đủ 24 lượt và config gốc/embedding trace, signature khớp source. Judge có lỗi phân loại refusal, UUID action và hiệu lực policy; xem AUDIT_PHASE8_20261011.md. Giữ raw chỉ số, không đổi nhận xét rà tay thành kết quả auto judge. API cho lượt mới vẫn khóa. report.docx đã được rà ngày 17/10 và chờ sinh viên duyệt/commit; cold start và bảo vệ chưa thực hiện.
