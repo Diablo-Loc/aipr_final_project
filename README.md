@@ -4,18 +4,18 @@
 
 ## Điều kiện chạy
 
-- Windows, Python 3.11.x; lệnh `python` trên PATH phải trỏ đến Python 3.11.x.
+- Windows, Python 3.11.x; lệnh `python` trên PATH phải trỏ đến Python 3.11.x. Bản này kiểm tra đúng phiên bản 3.11.x, chưa hỗ trợ Python 3.12/3.13/3.14. Nếu máy có nhiều phiên bản, chọn 3.11 cho terminal trước khi chạy.
 - Có mạng để cài thư viện và gọi Groq/Jina.
 - Người chạy tự tạo `.env` theo mẫu `.env.example`, điền `GROQ_API_KEY` và `JINA_API_KEY`. Giữ key trên máy cá nhân, không đưa lên Git hoặc báo cáo.
-- Mở PowerShell tại thư mục chứa `make.cmd` và `run.py`.
+- Mở CMD hoặc PowerShell tại thư mục chứa `make.cmd` và `run.py`. Các lệnh dưới đây dùng được trong cả hai terminal; giữ dấu ngoặc kép bao quanh nội dung câu hỏi.
 
 ## Cài đặt và chạy demo bằng một lệnh
 
-```powershell
-cmd /d /c "make setup && make demo"
+```cmd
+cmd /d /c ".\make.cmd setup && .\make.cmd demo"
 ```
 
-Đây là lệnh Windows tương ứng `make setup && make demo` trong yêu cầu môn học. Chương trình tự tạo `.venv`, cài theo `requirements.lock.txt`, khởi chạy MCP server, discover công cụ và chạy demo. Không cần activate venv hoặc mở server riêng. Không cần cài GNU Make trên Windows vì repo có `make.cmd`.
+Đây là lệnh Windows tương ứng `make setup && make demo` trong yêu cầu môn học. `cmd /d /c` xử lý phép nối `&&` cho cả CMD và Windows PowerShell. Gọi rõ `.\make.cmd` để dùng launcher của repo, không phụ thuộc GNU Make. Chương trình tự tạo `.venv`, cài theo `requirements.lock.txt`, khởi chạy MCP server, discover công cụ và chạy demo. Không cần activate venv hoặc mở server riêng. Nếu setup lỗi, phần demo không được chạy.
 
 Demo mặc định chạy bốn câu bằng API thật:
 
@@ -26,15 +26,17 @@ Demo mặc định chạy bốn câu bằng API thật:
 | Ngân sách đã chi của P001? | `no_answer`, không đoán ngân sách |
 | Tạo yêu cầu xử lý nếu P001 có rủi ro | `action_verified`, ghi SQLite và đọc lại khớp bản ghi |
 
-Màn hình có câu trả lời, citation, USAGE và đường dẫn trace `logs/demo_live_*.jsonl`. CLI chạy xong thì thoát; câu hỏi khác được truyền qua tùy chọn `--query`, hành động ghi cần `--allow-write`. Các tùy chọn này chuyển tiếp qua `make demo`, không phải bước cài đặt thêm.
+Màn hình có câu trả lời, citation, USAGE và đường dẫn trace `logs/demo_live_*.jsonl`. CLI chạy xong thì thoát; câu hỏi khác được truyền qua tùy chọn `--query`, hành động ghi cần `--allow-write`. Các tùy chọn này chuyển tiếp qua `.\make.cmd demo`, không phải bước cài đặt thêm. Sau khi cài đặt, muốn chạy lại bốn câu mặc định thì dùng `.\make.cmd demo`.
 
 ## Đánh giá
 
-```powershell
-cmd /d /c "make eval"
+```cmd
+.\make.cmd eval
 ```
 
-Đây là lệnh đánh giá riêng, không cần chạy trước để khởi động demo. Mặc định chạy một đợt gồm 12 câu × dense/hybrid, dùng API agent, embedding và judge. Kết quả lưu ở `logs/eval_live_*.jsonl` và `results/live/`: `per_query.csv`, `summary.json`, `accuracy.png`. Lệnh hoàn tất không đồng nghĩa mọi câu đều PASS; cần đọc điểm từng câu và phân tích ca thất bại.
+Đây là launcher Windows cho `make eval`, là lệnh đánh giá riêng, không cần chạy trước để khởi động demo. Mặc định chạy một đợt gồm 12 câu × dense/hybrid, dùng API agent, embedding và judge. Kết quả lưu ở `logs/eval_live_*.jsonl` và `results/live/`: `per_query.csv`, `summary.json`, `accuracy.png`. Lệnh hoàn tất không đồng nghĩa mọi câu đều PASS; cần đọc điểm từng câu, `judge_errors` và phân tích ca thất bại.
+
+Nếu hiện `Live judge unavailable; checkpoint retained` hoặc thông báo API không khả dụng, lượt đánh giá chưa hoàn tất. Giữ log; sau khi xử lý nguyên nhân API, người dùng có thể chủ động chạy lại cùng lệnh. Chương trình tiếp tục lượt dở nếu signature mã nguồn/cấu hình khớp. Kết quả tổng hợp chỉ được ghi khi đủ lượt; một lượt hoàn tất mới sẽ cập nhật các tệp trong `results/live/`.
 
 Số liệu E1 ngày 11/10/2026 đã có trong repo và báo cáo: functional 8/12 mỗi mode, grounded 7/12 dense và 6/12 hybrid, mean faithfulness 0,7500 và 0,7917; correct refusal theo judge 0/4. Các bất đồng judge được phân tích trong báo cáo. Lượt API mới có thể cho câu trả lời/token/điểm khác; giữ log gốc để đối chiếu, không tự sửa kết quả cũ thành đạt.
 
@@ -42,11 +44,17 @@ Số liệu E1 ngày 11/10/2026 đã có trong repo và báo cáo: functional 8/
 
 Sau khi đã cài đặt, dùng mẫu sau và thay `NỘI DUNG CÂU HỎI` bằng câu bạn muốn hỏi. Câu hỏi không cần có sẵn trong testset; khi bảo vệ, nhập câu hỏi giảng viên đưa tại chỗ:
 
-```powershell
-cmd /d /c 'make demo --query "NỘI DUNG CÂU HỎI"'
+```cmd
+.\make.cmd demo --query "NỘI DUNG CÂU HỎI"
 ```
 
-Nếu cho phép tạo phiếu, thêm `--allow-write` ngay sau dấu ngoặc kép đóng câu hỏi, trước dấu nháy đơn cuối lệnh: `cmd /d /c 'make demo --query "NỘI DUNG CÂU HỎI" --allow-write'`. Quyền ghi không bỏ qua việc kiểm tra dữ liệu và rủi ro.
+Nếu cho phép tạo phiếu, thêm `--allow-write` sau nội dung câu hỏi:
+
+```cmd
+.\make.cmd demo --query "NỘI DUNG CÂU HỎI" --allow-write
+```
+
+Quyền ghi không bỏ qua việc kiểm tra dữ liệu và rủi ro. Cả hai mẫu trên dùng trực tiếp trong CMD hoặc PowerShell, không bọc thêm dấu nháy đơn hay `cmd /d /c`.
 
 Ví dụ thuộc phạm vi đồ án (kết quả dưới đây là kỳ vọng để đối chiếu, không phải kết quả của lượt API mới):
 
@@ -77,6 +85,6 @@ Ba cách chạy chính phục vụ ba việc riêng: cài đặt kèm demo, đá
 
 ## Trạng thái kiểm chứng
 
-Phase 9 đã commit tại `fb4d1d6`. Ngày 17/10/2026, checkout riêng từ commit này và venv mới đã cài thành công, pip check OK, 48/48 tests đạt, demo offline bốn câu đạt, evaluation offline 24/24 functional đạt và client MCP thứ hai ghi–đọc xác minh thành công. Offline không đo chất lượng LLM thật. Cold demo live ở môi trường mới/máy giảng viên chưa được xác minh.
+Phase 9 đã commit tại `fb4d1d6`. Ngày 17/10/2026, checkout riêng từ commit này và venv mới đã cài thành công, pip check OK, 48/48 tests đạt, demo offline bốn câu đạt, evaluation offline 24/24 functional đạt và client MCP thứ hai ghi–đọc xác minh thành công. Offline không đo chất lượng LLM thật. Sinh viên đã cung cấp kết quả demo live từ bản tải GitHub với bốn câu mặc định và câu hỏi riêng về P002 đúng kết quả kỳ vọng. Chưa kiểm chứng trên máy giảng viên.
 
 Sản phẩm nộp gồm Word và repo ZIP hoặc link có lịch sử Git, kèm data/prompts/testset/logs/results/ai-usage. Không đóng gói `.env`, `.venv`, cache, state hoặc công cụ kiểm tra ngoài repo. Bản Download ZIP tự động từ GitHub không chứa lịch sử `.git`; nếu nộp ZIP phải chuẩn bị bản có lịch sử theo yêu cầu.
